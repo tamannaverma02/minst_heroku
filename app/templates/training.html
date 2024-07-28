@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MNIST Training and Testing</title>
+    <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+    <script src="//cdn.socket.io/4.4.1/socket.io.min.js"></script>
+</head>
+<body>
+    <h1>MNIST Training and Testing</h1>
+    
+    <div>
+        <h2>Allocate Processors</h2>
+        <label for="train_processors">Number of Processors for Training:</label>
+        <input type="number" id="train_processors" min="1" max="8" value="1">
+        <br>
+        <label for="test_processors">Number of Processors for Testing:</label>
+        <input type="number" id="test_processors" min="1" max="8" value="1">
+    </div>
+
+    <div>
+        <h2>Training Logs</h2>
+        <textarea id="training_logs" cols="80" rows="20" readonly></textarea>
+    </div>
+
+    <div>
+        <h2>Testing Logs</h2>
+        <textarea id="testing_logs" cols="80" rows="20" readonly></textarea>
+    </div>
+
+    <button onclick="startTraining()">Start Training</button>
+    <button onclick="stopTraining()">Stop Training</button>
+    <button onclick="startTesting()">Start Testing</button>
+    <button onclick="stopTesting()">Stop Testing</button>
+
+    <script type="text/javascript">
+        var socket = io.connect('http://' + document.domain + ':' + location.port + '/mnist');
+
+        socket.on('training_log', function(data) {
+            $('#training_logs').val($('#training_logs').val() + data.msg + '\n');
+            $('#training_logs').scrollTop($('#training_logs')[0].scrollHeight);
+        });
+
+        socket.on('testing_log', function(data) {
+            $('#testing_logs').val($('#testing_logs').val() + data.msg + '\n');
+            $('#testing_logs').scrollTop($('#testing_logs')[0].scrollHeight);
+        });
+
+        function startTraining() {
+            var num_processors = $('#train_processors').val();
+            socket.emit('start_training', {num_processors: num_processors});
+        }
+
+        function stopTraining() {
+            socket.emit('stop_training');
+        }
+
+        function startTesting() {
+            var num_processors = $('#test_processors').val();
+            socket.emit('start_testing', {num_processors: num_processors});
+        }
+
+        function stopTesting() {
+            socket.emit('stop_testing');
+        }
+    </script>
+</body>
+</html>
