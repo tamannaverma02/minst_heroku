@@ -1,0 +1,8 @@
+ Flask 
+ Flask-SocketIO 
+ Flask-WTF 
+ eventlet 
+ numpy 
+ scikit-learn 
+ tensorflow  
+ gunicorn
